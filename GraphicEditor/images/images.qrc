@@ -1,0 +1,35 @@
+<RCC>
+    <qresource prefix="/">
+        <file>copy.png</file>
+        <file>cut.png</file>
+        <file>export.png</file>
+        <file>file.png</file>
+        <file>find.png</file>
+        <file>import.png</file>
+        <file>newFile.png</file>
+        <file>open.png</file>
+        <file>paste.png</file>
+        <file>picture.png</file>
+        <file>print.png</file>
+        <file>redo.png</file>
+        <file>save.png</file>
+        <file>saveAs.png</file>
+        <file>undo.png</file>
+        <file>bold.png</file>
+        <file>font.png</file>
+        <file>italic.png</file>
+        <file>table.png</file>
+        <file>textAlign.png</file>
+        <file>underline.png</file>
+        <file>date.png</file>
+        <file>selectAll.png</file>
+        <file>center-alignment.png</file>
+        <file>justify-align.png</file>
+        <file>left-indent.png</file>
+        <file>right-indent.png</file>
+        <file>color.png</file>
+        <file>close.png</file>
+        <file>exit.png</file>
+        <file>code.png</file>
+    </qresource>
+</RCC>
