@@ -9,10 +9,10 @@ MainWindow::MainWindow(QWidget *parent)
     mdiArea->setViewMode(QMdiArea::TabbedView);
     mdiArea->setDocumentMode(true);
     this->setCentralWidget(mdiArea);
-    connect(mdiArea,&QMdiArea::subWindowActivated,this,&MainWindow::updateMenus);
-    updateMenus();
     createActions();
     createMenus();
+    connect(mdiArea,&QMdiArea::subWindowActivated,this,&MainWindow::updateMenus);
+    updateMenus();
 }
 
 MainWindow::~MainWindow()
@@ -307,7 +307,6 @@ void MainWindow::createMenus()
     insertMenu->addAction(insertTableAction);
     insertMenu->addAction(insertCurDateAction);
 
-
     textMenu = new QMenu(tr("&text format"));
     textMenu->addAction(boldTextAction);
     textMenu->addAction(italicTextAction);
@@ -351,28 +350,26 @@ void MainWindow::createMenus()
 void MainWindow::fileNew()
 {
     //open
-    SubTextEdit *textEditor = createSubWindow();
+    SubTextEdit *textEditor = createTextEditor();
     mdiArea->setTabsMovable(1);
     mdiArea->setTabsClosable(1);
     textEditor->newFile();
     textEditor->show();
+    enableTextEdit();
 }
 
 // create a new subwindow and make subtextEdit become subwindow's central widget
-SubTextEdit *MainWindow::createSubWindow()
-{
-    SubTextEdit* textEditor = new SubTextEdit;
-    mdiArea->addSubWindow(textEditor);
-    connect(textEditor,&SubTextEdit::copyAvailable,cutAction,&QAction::setEnabled);
-    connect(textEditor,&SubTextEdit::copyAvailable,copyAction,&QAction::setEnabled);
-    return textEditor;
-}
 
 void MainWindow::enableTextEdit()
 {
     insertImageAction->setEnabled(true);
     insertTableAction->setEnabled(true);
     insertCurDateAction->setEnabled(true);
+    undoAction->setEnabled(true);
+    redoAction->setEnabled(true);
+    selectAllAction->setEnabled(true);
+    cutAction->setEnabled(true);
+    pasteAction->setEnabled(true);
     boldTextAction->setEnabled(true);
     italicTextAction->setEnabled(true);
     underlineTextAction->setEnabled(true);
@@ -399,15 +396,68 @@ void MainWindow::enableTextEdit()
 
 void MainWindow::updateMenus()
 {
-   // bool hasSubTextEditor =(activeTextEditor()!=0);
+    bool hasModifiedWindow =(activeTextEditor()!=0);
+    insertImageAction->setEnabled(hasModifiedWindow);
+    saveAction->setEnabled(hasModifiedWindow);
+    saveAsAction->setEnabled(hasModifiedWindow);
+    printAction->setEnabled(hasModifiedWindow);
+    closeAction->setEnabled(hasModifiedWindow);
+    exportAction->setEnabled(hasModifiedWindow);
+    insertImageAction->setEnabled(hasModifiedWindow);
+    insertTableAction->setEnabled(hasModifiedWindow);
+    insertCurDateAction->setEnabled(hasModifiedWindow);
+    undoAction->setEnabled(hasModifiedWindow);
+    redoAction->setEnabled(hasModifiedWindow);
+    selectAllAction->setEnabled(hasModifiedWindow);
+    cutAction->setEnabled(hasModifiedWindow);
+    copyAction->setEnabled(hasModifiedWindow);
+    pasteAction->setEnabled(hasModifiedWindow);
+    boldTextAction->setEnabled(hasModifiedWindow);
+    italicTextAction->setEnabled(hasModifiedWindow);
+    underlineTextAction->setEnabled(hasModifiedWindow);
+    alignLeftAction->setEnabled(hasModifiedWindow);
+    alignRightAction->setEnabled(hasModifiedWindow);
+    alignCenterAction->setEnabled(hasModifiedWindow);
+    alignJustifyAction->setEnabled(hasModifiedWindow);
+    colorAction->setEnabled(hasModifiedWindow);
+    styleTitleAction->setEnabled(hasModifiedWindow);
+    styleSubTitleAction->setEnabled(hasModifiedWindow);
+    styleHeading1Action->setEnabled(hasModifiedWindow);
+    styleHeading2Action->setEnabled(hasModifiedWindow);
+    styleHeading3Action->setEnabled(hasModifiedWindow);
+    styleBodyAction->setEnabled(hasModifiedWindow);
+    listDisc->setEnabled(hasModifiedWindow);
+    listCircle->setEnabled(hasModifiedWindow);
+    listSquare->setEnabled(hasModifiedWindow);
+    listDecimal->setEnabled(hasModifiedWindow);
+    listLowerAlpha->setEnabled(hasModifiedWindow);
+    listLowerRoman->setEnabled(hasModifiedWindow);
+    listUpperAlpha->setEnabled(hasModifiedWindow);
+    listUpperRoman->setEnabled(hasModifiedWindow);
 }
 
 SubTextEdit *MainWindow::activeTextEditor()
 {
-   // if(QMdiSubWindow *)
+    if(QMdiSubWindow *activeSubWindow = mdiArea->activeSubWindow())
+    {
+    return qobject_cast<SubTextEdit *>(activeSubWindow->widget());
+    }
+    return 0;
 }
 
 void MainWindow::fileOpen()
 {
+//   QString filename = QFileDialog::getOpenFileName(this,tr("open files"),tr("Geditor(*.gtxt)"));
+//   if(filename.isEmpty()==false)
+//   {
+//   }
+}
 
+SubTextEdit *MainWindow::createTextEditor()
+{
+    SubTextEdit *textEditor = new SubTextEdit;
+    mdiArea->addSubWindow(textEditor);
+    connect(textEditor,&SubTextEdit::copyAvailable,cutAction,&QAction::setEnabled);
+    connect(textEditor,&SubTextEdit::copyAvailable,copyAction,&QAction::setEnabled);
+    return  textEditor;
 }

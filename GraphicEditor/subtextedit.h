@@ -8,26 +8,23 @@
 
 class SubTextEdit : public QTextEdit
 {
+    Q_OBJECT
 public:
     SubTextEdit();
 
     void newFile();
-    //return current filename
     QString currentFileName();
-    //return current file path
-    QString currentFilePath();
+    QString currentFullFileName();
 protected:
    void closeEvent(QCloseEvent *event);
 private:
-    //statusbar will update status
     void documentWasModified();
     void setCurFileName(QString &filename);
+    bool loadFilie(const QString &filename);
+    void readFile(const QString &filename);
     QString strippedName(const QString &fullFileName) ;
-   //curFile retains current filename which was not saved
-
-     // current file path
     QString curFileName;
-    QString curFilePath;
+    QString curFullFileName;
     bool isUntitled;
 };
 

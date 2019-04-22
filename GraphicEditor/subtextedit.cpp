@@ -1,4 +1,5 @@
 #include "subtextedit.h"
+#include <QtWidgets>
 
 SubTextEdit::SubTextEdit()
 {
@@ -10,15 +11,14 @@ void SubTextEdit::newFile()
 {
     static  int subSequenceNumber = 1;
     isUntitled = true;
-    //curfile retains current temporary filename
     curFileName= tr("Document %1").arg(subSequenceNumber++);
-    //setwindowtitle
-    this->setWindowTitle(curFileName+"-Geditor");
+    this->setWindowTitle(curFileName+"[*]"+"-Geditor");
+    connect(document(),&QTextDocument::contentsChanged,this,&SubTextEdit::documentWasModified);
 }
 
 QString SubTextEdit::currentFileName()
 {
-    return curFileName;
+    return strippedName(curFullFileName);
 }
 
 void SubTextEdit::closeEvent(QCloseEvent *event)
@@ -26,13 +26,28 @@ void SubTextEdit::closeEvent(QCloseEvent *event)
     event->accept();
 }
 
-QString SubTextEdit::currentFilePath()
-{
-    return curFilePath;
-}
-
 void SubTextEdit::documentWasModified()
 {
     this->setWindowModified(document()->isModified());
 }
 
+QString SubTextEdit::strippedName(const QString &fullfilename)
+{
+    return  QFileInfo(fullfilename).fileName();
+}
+
+bool SubTextEdit::loadFilie(const QString &filename)
+{
+    if(filename.isEmpty()==false)
+    {
+        if(QFile::exists(filename)==false)
+        {
+            return false;
+        }
+        QFile file(filename);
+        if(file.open(QFile::ReadOnly)==false)
+        {
+
+        }
+    }
+}

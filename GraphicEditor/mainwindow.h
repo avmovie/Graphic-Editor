@@ -11,6 +11,7 @@
 #include <QActionGroup>
 #include <QMdiSubWindow>
 #include <QMessageBox>
+#include <QFileDialog>
 #include "subtextedit.h"
 
 class MainWindow : public QMainWindow
@@ -92,14 +93,17 @@ private:
     QMenu *textMenu;
     QMenu *alignMenu;
 
+
     void fileNew();
     void windowTitle();
-    SubTextEdit *createSubWindow();
     void enableTextEdit();
     void updateMenus();
+    SubTextEdit *createTextEditor();
     SubTextEdit *activeTextEditor();
 
     void fileOpen();
+    void fileLoad(const QString &FullFileName);
+    void setCurrentFile(const QString &filename);
 //    void fileSave();
 //    void fileSaveAs();
 //    void filePrint();
