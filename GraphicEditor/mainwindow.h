@@ -12,6 +12,18 @@
 #include <QMdiSubWindow>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QTextCodec>
+#include <QString>
+#include <QTextCursor>
+#include <QToolBar>
+#include <QComboBox>
+#include <QFontComboBox>
+#include <QColorDialog>
+#include <QTextListFormat>
+#include <QFontDatabase>
+#include <QPrintDialog>
+#include <QPrinter>
+#include <QPrintPreviewDialog>
 #include "subtextedit.h"
 
 class MainWindow : public QMainWindow
@@ -24,6 +36,8 @@ public:
 private:
     void createActions();
     void createMenus();
+    void createToolBars();
+    void createStatus();
 
     QMdiArea *mdiArea;
     QAction *newAction;
@@ -32,7 +46,7 @@ private:
     QAction *saveAsAction;
     QAction *exportAction;
     QAction *printAction;
-    QAction *closeAction;
+    QAction *printViewAction;
     QAction *exitAction;
 
     QAction *undoAction;
@@ -93,6 +107,14 @@ private:
     QMenu *textMenu;
     QMenu *alignMenu;
 
+    QToolBar *fileToolBar;				//font attributes tool bar
+    QToolBar *editToolBar;				// font edit attributes tool bar
+    QToolBar *formatToolBar;			//font format attributes tool bar
+    QToolBar *comboToolBar;				//font combox tool bar
+    QComboBox *comboStyle;
+    QFontComboBox *combo;
+    QComboBox *comboSize;				//font size combox
+    QFontComboBox *comboFont;			//chose font family
 
     void fileNew();
     void windowTitle();
@@ -102,26 +124,28 @@ private:
     SubTextEdit *activeTextEditor();
 
     void fileOpen();
+    QMdiSubWindow *findOpenedFile(const QString &filename);	//check opened file whether was already opend in editor
     void fileLoad(const QString &FullFileName);
-    void setCurrentFile(const QString &filename);
-//    void fileSave();
-//    void fileSaveAs();
-//    void filePrint();
-//    void copy();
-//    void paste();
-//    void insertImage();
-//    void insertTable();
-//    void insertDate();
-//
-//    void textBold(bool);
-//    void textItalic(bool);
-//    void textUnderline(bool);
-//   void textCode(bool);
-//
-//    void textAlign(QAction *txtalg);
-//    void textColor();
-//void styleTitle();
 
+    void fileSave();
+    void fileSaveAs();
+    void undo();
+    void redo();
+    void cut();
+    void copy();
+    void paste();
+    void selectAll();
+    void listStyle(int i);
+    void textColor();
+    void textFamily(const QString &f);
+    void textSize(const QString &p);
+    void textBold();
+    void textItalic();
+    void textUnderline();
+    void textAlign(QAction *a);
+    void filePrint();
+    void filePrintView();
+    void printPreview(QPrinter *);
 };
 
 #endif // MAINWINDOW_H

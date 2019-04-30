@@ -3,6 +3,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+
     mdiArea = new QMdiArea;
     mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -11,9 +12,11 @@ MainWindow::MainWindow(QWidget *parent)
     this->setCentralWidget(mdiArea);
     createActions();
     createMenus();
+    createToolBars();
     connect(mdiArea,&QMdiArea::subWindowActivated,this,&MainWindow::updateMenus);
     updateMenus();
 }
+
 
 MainWindow::~MainWindow()
 {
@@ -29,13 +32,6 @@ void MainWindow::createActions()
     newAction->setStatusTip(tr("new file"));
     connect(newAction,&QAction::triggered,this,&MainWindow::fileNew);
 
-    closeAction = new QAction(tr("&close file"),this);
-    closeAction->setIcon(QIcon(":/close.png"));
-    closeAction->setShortcut(QKeySequence::Close);
-    closeAction->setToolTip(tr("close file"));
-    closeAction->setStatusTip(tr("close file"));
-    //connect(closeAction,&QAction::triggered,this,&MainWindow::fileNew);
-
     openAction = new QAction(tr("&open file"));
     openAction->setIcon(QIcon(":/open.png"));
     openAction->setShortcut(QKeySequence::Open);
@@ -48,28 +44,32 @@ void MainWindow::createActions()
     saveAction->setShortcut(QKeySequence::Save);
     saveAction->setToolTip(tr("save current file"));
     saveAction->setStatusTip(tr("save file"));
-    //connect(saveAction,&QAction::triggered,this,&MainWindow::fileSave);
+    connect(saveAction,&QAction::triggered,this,&MainWindow::fileSave);
 
    saveAsAction = new QAction(tr("save as"));
    saveAsAction->setIcon(QIcon(":/saveAs.png"));
    saveAsAction->setShortcut(QKeySequence::SaveAs);
    saveAsAction->setToolTip(tr("save file as"));
    saveAsAction->setStatusTip(tr("save file as"));
-   //connect(saveAsAction,&QAction::triggered,this,&MainWindow::fileSaveAs);
+   connect(saveAsAction,&QAction::triggered,this,&MainWindow::fileSaveAs);
 
    printAction = new QAction(tr("&print"));
    printAction->setIcon(QIcon(":/print.png"));
    printAction->setShortcut(QKeySequence::Print);
    printAction->setToolTip(tr("print document"));
    printAction->setStatusTip(tr("print document"));
-   //connect(printAction,&QAction::triggered,this,&MainWindow::printAction);
+   connect(printAction,&QAction::triggered,this,&MainWindow::filePrint);
+   printViewAction = new QAction(tr("print view"),this);
+   printViewAction->setStatusTip(tr("print view"));
+   connect(printViewAction,&QAction::triggered,this,&MainWindow::filePrintView);
+
 
    exportAction = new QAction(tr("&export"));
    exportAction->setIcon(QIcon(":/export.png"));
    exportAction->setShortcut(QKeySequence::Print);
    exportAction->setToolTip(tr("export document"));
    exportAction->setStatusTip(tr("export document"));
-   //connect(exportAction,&QAction::triggered,this,&MainWindow::printAction);
+   //connect(exportAction,&QAction::triggered,this,&MainWindow::export);
 
     exitAction = new QAction(tr("&exit"),this);
     exitAction->setIcon(QIcon(":/exit.png"));
@@ -83,39 +83,44 @@ void MainWindow::createActions()
    undoAction->setShortcut(QKeySequence::Undo);
    undoAction->setToolTip(tr("undo former action"));
    undoAction->setStatusTip(tr("undo former action"));
+   connect(undoAction,&QAction::triggered,this,&MainWindow::undo);
+
+
 
    redoAction = new QAction(tr("&redo"));
    redoAction->setIcon(QIcon(":/redo.png"));
    redoAction->setShortcut(QKeySequence::Redo);
    redoAction->setToolTip(tr("redo former action"));
    redoAction->setStatusTip(tr("redo former action"));
+   connect(redoAction,&QAction::triggered,this,&MainWindow::redo);
 
    cutAction = new QAction(tr("cut"));
    cutAction->setIcon(QIcon(":/cut.png"));
    cutAction ->setShortcut(QKeySequence::Cut);
    cutAction->setToolTip(tr("cut text"));
    cutAction->setStatusTip(tr("cut text"));
+   connect(cutAction,&QAction::triggered,this,&MainWindow::cut);
 
    copyAction= new QAction(tr("copy"));
    copyAction->setIcon(QIcon(":/copy.png"));
    copyAction->setShortcut(QKeySequence::Copy);
    copyAction->setToolTip(tr("copy text"));
    copyAction->setStatusTip(tr("copy text"));
-   //connect(copyAction,&QAction::triggered,this,&MainWindow::copy);
+   connect(copyAction,&QAction::triggered,this,&MainWindow::copy);
 
    pasteAction= new QAction(tr("paste text"));
    pasteAction->setIcon(QIcon(":/paste.png"));
    pasteAction->setShortcut(QKeySequence::Paste);
    pasteAction->setToolTip(tr("paste text"));
    pasteAction->setStatusTip(tr("paste text"));
-   //connect(pasteAction,&QAction::triggered,this,&MainWindow::paste);
+   connect(pasteAction,&QAction::triggered,this,&MainWindow::paste);
 
    selectAllAction= new QAction(tr("select All"));
    selectAllAction->setIcon(QIcon(":/selectAll.png"));
    selectAllAction->setShortcut(QKeySequence::SelectAll);
    selectAllAction->setToolTip(tr("selectAll text"));
    selectAllAction->setStatusTip(tr("selectAll text"));
-   ////connect(selectAllAction,&QAction::triggered,this,&SubTextEdit::selectAll);
+   connect(selectAllAction,&QAction::triggered,this,&MainWindow::selectAll);
 
    insertImageAction= new QAction(tr("insert image"));
    insertImageAction->setIcon(QIcon(":/picture.png"));
@@ -145,7 +150,7 @@ void MainWindow::createActions()
     boldTextAction->setShortcut(QKeySequence::Bold);
     boldTextAction->setToolTip(tr("bold font"));
     boldTextAction->setStatusTip(tr("bold font"));
-    //connect(boldTextAction,&QAction::trigger,this,&MainWindow::textBold);
+    connect(boldTextAction,&QAction::trigger,this,&MainWindow::textBold);
 
     italicTextAction = new QAction(tr("italic"));
     italicTextAction->setShortcut(QKeySequence::Italic);
@@ -153,7 +158,7 @@ void MainWindow::createActions()
     italicTextAction->setCheckable(true);
     italicTextAction->setToolTip(tr("italic font"));
     italicTextAction->setStatusTip("font italic");
-    //connect(italicTextAction,&QAction::triggered,this,&MainWindow::italicTextAction);
+    connect(italicTextAction,&QAction::triggered,this,&MainWindow::textItalic);
 
     underlineTextAction = new QAction(tr("underline"));
     underlineTextAction->setShortcut(QKeySequence::Underline);
@@ -161,10 +166,10 @@ void MainWindow::createActions()
     underlineTextAction->setCheckable(true);
     underlineTextAction->setToolTip(tr("underline font"));
     underlineTextAction->setStatusTip("font underline");
-    //connect(underlineTextAction,&QAction::triggered,this,&MainWindow::underlineTextAction);
+    connect(underlineTextAction,&QAction::triggered,this,&MainWindow::textUnderline);
 
     groupTextFormat = new QActionGroup(this);
-    //connect(groupTextFormat,&QActionGroup::triggered,this,&MainWindow::textAlign);
+    connect(groupTextFormat,&QActionGroup::triggered,this,&MainWindow::textAlign);
     if(QApplication::isLeftToRight())
     {
     alignLeftAction = new QAction(tr("left"),groupTextFormat);
@@ -208,7 +213,7 @@ void MainWindow::createActions()
    colorAction->setShortcut(Qt::CTRL+Qt::SHIFT+Qt::Key_C);
    colorAction->setToolTip(tr("regulate color"));
    colorAction->setStatusTip(tr("regulate color"));
-   //connect(colorAction,&QAction::triggered,this,&MainWindow::textColor);
+   connect(colorAction,&QAction::triggered,this,&MainWindow::textColor);
 
    groupTextStyle = new QActionGroup(this);
 
@@ -281,6 +286,7 @@ void MainWindow::createActions()
     aboutQtAction = new QAction(tr("aboutQt"));
     connect(aboutQtAction,&QAction::triggered,this,&QApplication::aboutQt);
 }
+
 void MainWindow::createMenus()
 {
     fileMenu = menuBar()->addMenu(tr("&file"));
@@ -290,7 +296,6 @@ void MainWindow::createMenus()
     fileMenu->addAction(saveAsAction);
     fileMenu->addSeparator();
     fileMenu->addAction(printAction);
-    fileMenu->addAction(closeAction);
     fileMenu->addAction(exportAction);
     fileMenu->addAction(exitAction);
 
@@ -347,19 +352,83 @@ void MainWindow::createMenus()
 
 }
 
+void MainWindow::createToolBars()
+{
+    fileToolBar = addToolBar(tr("new"));
+    fileToolBar->addAction(newAction);
+    fileToolBar->addAction(openAction);
+    fileToolBar->addAction(saveAction);
+    fileToolBar->addSeparator();
+    fileToolBar->addAction(printAction);
+
+    editToolBar= addToolBar(tr("edit"));
+    editToolBar->addAction(redoAction);
+    editToolBar->addAction(undoAction);
+    editToolBar->addSeparator();
+    editToolBar->addAction(cutAction);
+    editToolBar->addAction(copyAction);
+    editToolBar->addAction(pasteAction);
+
+    formatToolBar = addToolBar(tr("format"));
+    formatToolBar->addAction(boldTextAction);
+    formatToolBar->addAction(underlineTextAction);
+    formatToolBar->addAction(italicTextAction);
+    formatToolBar->addSeparator();
+    formatToolBar->addAction(alignLeftAction);
+    formatToolBar->addAction(alignRightAction);
+    formatToolBar->addAction(alignCenterAction);
+    formatToolBar->addAction(alignJustifyAction);
+    formatToolBar->addAction(colorAction);
+
+    comboToolBar = addToolBar(tr("combo chose"));
+    comboStyle = new QComboBox();
+    comboToolBar->addWidget(comboStyle);
+    comboStyle->addItem("standard");
+    comboStyle->addItem("Disc(●)");
+    comboStyle->addItem("Circle(○)");
+    comboStyle->addItem("Square(■)");
+    comboStyle->addItem("Decimal(1.2.3.)");
+    comboStyle->addItem("LowerAlpha(a.b.)");
+    comboStyle->addItem("UpperAlpha(A.B.)");
+    comboStyle->addItem("LowerRoman(i.ii.)");
+    comboStyle->addItem("UpperRoman(I.II.)");
+    comboStyle->setToolTip(tr("set list style"));
+    connect(comboStyle, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),this,&MainWindow::listStyle);
+
+    comboFont = new QFontComboBox();
+    comboToolBar->addWidget(comboFont);
+    comboFont->setStatusTip("change font-family");
+    connect(comboFont,static_cast<void(QComboBox::*)(const QString &)>(&QComboBox::activated),this,&MainWindow::textFamily);
+    comboSize = new QComboBox();
+    comboToolBar->addWidget(comboSize);
+    comboSize->setEditable(true);
+    comboSize->setToolTip(tr("change font size"));
+    QFontDatabase db;
+    foreach (int size,db.standardSizes()) {
+        comboSize->addItem(QString::number(size));
+    connect(comboSize,static_cast<void(QComboBox::*)(const QString &)>(&QComboBox::activated),this,&MainWindow::textSize);
+    comboSize->setCurrentIndex(comboSize->findText(QString::number(QApplication::font().pointSize())));
+    }
+}
+
+void MainWindow::createStatus()
+{
+    statusBar()->showMessage(tr("ready"));
+}
+
 void MainWindow::fileNew()
 {
-    //open
+    //create a new texteditor-->set mdiarea style with tab
     SubTextEdit *textEditor = createTextEditor();
     mdiArea->setTabsMovable(1);
     mdiArea->setTabsClosable(1);
     textEditor->newFile();
+    //after add this texteditor to subwindow,need to show this added texteditor otherwise,this new texteditor will not be shown
     textEditor->show();
     enableTextEdit();
 }
 
-// create a new subwindow and make subtextEdit become subwindow's central widget
-
+//after add texteditor and show it on subwindow,meanwhile need to enable some actions
 void MainWindow::enableTextEdit()
 {
     insertImageAction->setEnabled(true);
@@ -394,48 +463,54 @@ void MainWindow::enableTextEdit()
     listUpperRoman->setEnabled(true);
 }
 
+//when active different subwindow and subtexteditor,should show different enabled actions
 void MainWindow::updateMenus()
 {
-    bool hasModifiedWindow =(activeTextEditor()!=0);
-    insertImageAction->setEnabled(hasModifiedWindow);
-    saveAction->setEnabled(hasModifiedWindow);
-    saveAsAction->setEnabled(hasModifiedWindow);
-    printAction->setEnabled(hasModifiedWindow);
-    closeAction->setEnabled(hasModifiedWindow);
-    exportAction->setEnabled(hasModifiedWindow);
-    insertImageAction->setEnabled(hasModifiedWindow);
-    insertTableAction->setEnabled(hasModifiedWindow);
-    insertCurDateAction->setEnabled(hasModifiedWindow);
-    undoAction->setEnabled(hasModifiedWindow);
-    redoAction->setEnabled(hasModifiedWindow);
-    selectAllAction->setEnabled(hasModifiedWindow);
-    cutAction->setEnabled(hasModifiedWindow);
-    copyAction->setEnabled(hasModifiedWindow);
-    pasteAction->setEnabled(hasModifiedWindow);
-    boldTextAction->setEnabled(hasModifiedWindow);
-    italicTextAction->setEnabled(hasModifiedWindow);
-    underlineTextAction->setEnabled(hasModifiedWindow);
-    alignLeftAction->setEnabled(hasModifiedWindow);
-    alignRightAction->setEnabled(hasModifiedWindow);
-    alignCenterAction->setEnabled(hasModifiedWindow);
-    alignJustifyAction->setEnabled(hasModifiedWindow);
-    colorAction->setEnabled(hasModifiedWindow);
-    styleTitleAction->setEnabled(hasModifiedWindow);
-    styleSubTitleAction->setEnabled(hasModifiedWindow);
-    styleHeading1Action->setEnabled(hasModifiedWindow);
-    styleHeading2Action->setEnabled(hasModifiedWindow);
-    styleHeading3Action->setEnabled(hasModifiedWindow);
-    styleBodyAction->setEnabled(hasModifiedWindow);
-    listDisc->setEnabled(hasModifiedWindow);
-    listCircle->setEnabled(hasModifiedWindow);
-    listSquare->setEnabled(hasModifiedWindow);
-    listDecimal->setEnabled(hasModifiedWindow);
-    listLowerAlpha->setEnabled(hasModifiedWindow);
-    listLowerRoman->setEnabled(hasModifiedWindow);
-    listUpperAlpha->setEnabled(hasModifiedWindow);
-    listUpperRoman->setEnabled(hasModifiedWindow);
+    //at least one texteditor was created and shown
+    bool hasTextEditor =(activeTextEditor()!=0);
+    saveAction->setEnabled(hasTextEditor);
+    saveAsAction->setEnabled(hasTextEditor);
+    printAction->setEnabled(hasTextEditor);
+    exportAction->setEnabled(hasTextEditor);
+    pasteAction->setEnabled(hasTextEditor);
+    //at least has one texteditor was shown and textcursor select some text
+    bool hasSelectText = activeTextEditor();
+    undoAction->setEnabled(hasSelectText);
+    redoAction->setEnabled(hasSelectText);
+    cutAction->setEnabled(hasSelectText);
+    copyAction->setEnabled(hasSelectText);
+    pasteAction->setEnabled(hasSelectText);
+    pasteAction->setEnabled(hasSelectText);
+    selectAllAction->setEnabled(hasSelectText);
+    insertImageAction->setEnabled(hasSelectText);
+    insertTableAction->setEnabled(hasSelectText);
+    insertCurDateAction->setEnabled(hasSelectText);
+    boldTextAction->setEnabled(hasSelectText);
+    italicTextAction->setEnabled(hasSelectText);
+    underlineTextAction->setEnabled(hasSelectText);
+    alignCenterAction->setEnabled(hasSelectText);
+    alignLeftAction->setEnabled(hasSelectText);
+    alignRightAction->setEnabled(hasSelectText);
+    alignJustifyAction->setEnabled(hasSelectText);
+    styleTitleAction->setEnabled(hasSelectText);
+    styleSubTitleAction->setEnabled(hasSelectText);
+    styleBodyAction->setEnabled(hasSelectText);
+    styleHeading1Action->setEnabled(hasSelectText);
+    styleHeading2Action->setEnabled(hasSelectText);
+    styleHeading3Action->setEnabled(hasSelectText);
+    codeAction->setEnabled(hasSelectText);
+
+    listDisc->setEnabled(hasSelectText);
+    listCircle->setEnabled(hasSelectText);
+    listDecimal->setEnabled(hasSelectText);
+    listSquare->setEnabled(hasSelectText);
+    listLowerAlpha->setEnabled(hasSelectText);
+    listLowerRoman->setEnabled(hasSelectText);
+    listUpperAlpha->setEnabled(hasSelectText);
+    listUpperRoman->setEnabled(hasSelectText);
 }
 
+//when focus on different subwindow,get and return relevant subtexteditor
 SubTextEdit *MainWindow::activeTextEditor()
 {
     if(QMdiSubWindow *activeSubWindow = mdiArea->activeSubWindow())
@@ -447,17 +522,229 @@ SubTextEdit *MainWindow::activeTextEditor()
 
 void MainWindow::fileOpen()
 {
-//   QString filename = QFileDialog::getOpenFileName(this,tr("open files"),tr("Geditor(*.gtxt)"));
-//   if(filename.isEmpty()==false)
-//   {
-//   }
+    QString filename = QFileDialog::getOpenFileName(this,tr("open"),"../",tr("HTML(*htm *.html);;All(*.*)"));
+    //if this file already opend in Graphic editor
+    if(filename.isEmpty()==false)
+    {
+        //there have to be a function to check filename whether was already opend in editor
+        QMdiSubWindow *existFile = findOpenedFile(filename);
+        if(existFile)
+        {
+            mdiArea->setActiveSubWindow(existFile);
+            return;
+        }
+        //there have no opened file in editor,then add a new texteditor to subwindow and load it
+        SubTextEdit *editor = createTextEditor();
+        if(editor->loadFilie(filename))
+        {
+            statusBar()->showMessage(tr("file was already loaded"));
+            editor->show();
+        }
+        else {
+            editor->close();
+        }
+    }
+}
+
+QMdiSubWindow* MainWindow::findOpenedFile(const QString &filename)
+{
+    //canonicalfilepath meas file's absolute filepath but exclude linkfile
+    QString filePath = QFileInfo(filename).canonicalFilePath();
+    foreach (QMdiSubWindow *window, mdiArea->subWindowList()) {
+        SubTextEdit *textEditor = qobject_cast<SubTextEdit*>(window->widget());
+        if(textEditor->currentFile()==filePath)
+        {
+            return window;
+        }
+    }
+    return 0;
 }
 
 SubTextEdit *MainWindow::createTextEditor()
 {
+    //create a texteditor -->add it to subwindow-->enable copy and cut action-->return a pointer of this new texteditor
     SubTextEdit *textEditor = new SubTextEdit;
     mdiArea->addSubWindow(textEditor);
     connect(textEditor,&SubTextEdit::copyAvailable,cutAction,&QAction::setEnabled);
     connect(textEditor,&SubTextEdit::copyAvailable,copyAction,&QAction::setEnabled);
     return  textEditor;
+}
+
+void MainWindow::fileSave()
+{
+    if(activeTextEditor()&&activeTextEditor()->save())
+    {
+        statusBar()->showMessage(tr("save successfully"),2000);
+    }
+}
+
+void MainWindow::fileSaveAs()
+{
+    if(activeTextEditor()&&activeTextEditor()->saveAs())
+    {
+        statusBar()->showMessage(tr("saveAs successfully"),2000);
+    }
+}
+
+void MainWindow::redo()
+{
+    if(activeTextEditor())
+    {
+        activeTextEditor()->redo();
+    }
+}
+
+void MainWindow::undo()
+{
+    if(activeTextEditor())
+    {
+        activeTextEditor()->undo();
+    }
+}
+
+
+void MainWindow::cut()
+{
+    if(activeTextEditor())
+    {
+        activeTextEditor()->cut();
+    }
+}
+
+void MainWindow::copy()
+{
+    if(activeTextEditor())
+    {
+        activeTextEditor()->copy();
+    }
+}
+
+void MainWindow::paste()
+{
+    if(activeTextEditor())
+    {
+        activeTextEditor()->paste();
+    }
+}
+
+void MainWindow::selectAll()
+{
+    if(activeTextEditor())
+    {
+        activeTextEditor()->selectAll();
+    }
+}
+
+void MainWindow::textColor()
+{
+    if(activeTextEditor())
+    {
+        QColor color = QColorDialog::getColor(activeTextEditor()->textColor(),this);
+        if(color.isValid()==false)
+        {
+            return;
+        }
+        QTextCharFormat fmt;
+        fmt.setForeground(color);
+        activeTextEditor()->mergeCurrentCharFormat(fmt);
+       // colorChanged(color);
+    }
+}
+
+void MainWindow::listStyle(int i)
+{
+    if(activeTextEditor())
+    {
+        activeTextEditor()->setStyle(i);
+    }
+
+}
+
+void MainWindow::textBold()
+{
+    QTextCharFormat fmt;
+    fmt.setFontWeight(boldTextAction->isChecked()?QFont::Bold:QFont::Normal);
+    if(activeTextEditor())
+    {
+        activeTextEditor()->mergeFormatOnwordsOrSelection(fmt);
+    }
+}
+
+void MainWindow::textItalic()
+{
+    QTextCharFormat fmt;
+    fmt.setFontItalic(italicTextAction->isChecked());
+    if(activeTextEditor())
+    {
+        activeTextEditor()->mergeFormatOnwordsOrSelection(fmt);
+    }
+}
+
+void MainWindow::textUnderline()
+{
+    QTextCharFormat fmt;
+    fmt.setFontUnderline(underlineTextAction->isChecked());
+    if(activeTextEditor())
+    {
+        activeTextEditor()->mergeFormatOnwordsOrSelection(fmt);
+    }
+}
+
+void MainWindow::textFamily(const QString &f)
+{
+   QTextCharFormat fmt;
+   fmt.setFontFamily(f);
+}
+
+void MainWindow::textSize(const QString &p)
+{
+    qreal pointSize = p.toFloat();
+    if(p.toFloat()>0)
+    {
+        QTextCharFormat fmt;
+        fmt.setFontPointSize(pointSize);
+        if(activeTextEditor())
+        {
+            activeTextEditor()->mergeFormatOnwordsOrSelection(fmt);
+        }
+    }
+}
+
+void MainWindow::textAlign(QAction *a)
+{
+    if(a == alignLeftAction)
+        activeTextEditor()->setAlign(1);
+    else if(a == alignCenterAction)
+        activeTextEditor()->setAlign(2);
+    else if(a == alignRightAction)
+        activeTextEditor()->setAlign(3);
+    else if(a == alignJustifyAction)
+        activeTextEditor()->setAlign(4);
+}
+
+void MainWindow::filePrint()
+{
+    QPrinter printer(QPrinter::HighResolution);
+    QPrintDialog *dlg = new QPrintDialog(&printer,this);
+    if(activeTextEditor()->textCursor().hasSelection())
+    {
+        dlg->addEnabledOption(QAbstractPrintDialog::PrintSelection);
+    }
+        dlg->setWindowTitle(tr("print document"));
+        if(dlg->exec()==QDialog::Accepted)
+            activeTextEditor()->print(&printer);
+        delete dlg;
+}
+
+void MainWindow::filePrintView()
+{
+    QPrinter printer(QPrinter::HighResolution);
+    QPrintPreviewDialog preview(&printer,this);
+    connect(&preview,&QPrintPreviewDialog::paintRequested,this,&MainWindow::printPreview);
+    preview.exec();
+}
+
+void MainWindow::printPreview(QPrinter * printer)
+{
+    activeTextEditor()->print(printer);
 }
