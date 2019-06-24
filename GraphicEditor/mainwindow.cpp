@@ -63,13 +63,26 @@ void MainWindow::createActions()
    printViewAction->setStatusTip(tr("print view"));
    connect(printViewAction,&QAction::triggered,this,&MainWindow::filePrintView);
 
-
    exportAction = new QAction(tr("&export"));
    exportAction->setIcon(QIcon(":/export.png"));
    exportAction->setShortcut(QKeySequence::Print);
    exportAction->setToolTip(tr("export document"));
    exportAction->setStatusTip(tr("export document"));
    //connect(exportAction,&QAction::triggered,this,&MainWindow::export);
+
+   //close(ctrl+w)
+    closeAction = new QAction(tr("close"),this);
+    closeAction->setShortcut(Qt::CTRL+Qt::Key_X);
+    closeAction->setToolTip(tr("close current document"));
+    closeAction->setStatusTip(tr("close current document"));
+    connect(closeAction,&QAction::triggered,this,&MainWindow::closeDocument);
+
+    //close all(ctrl+shift+x)
+    closeAllAction = new QAction(tr("close all"));
+    closeAllAction->setShortcut(Qt::CTRL+Qt::SHIFT+Qt::Key_X);
+    closeAllAction->setToolTip(tr("close all documents"));
+    closeAllAction->setStatusTip(tr("close all documents"));
+    connect(closeAllAction,&QAction::triggered,this,&MainWindow::closeAllDocuments);
 
     exitAction = new QAction(tr("&exit"),this);
     exitAction->setIcon(QIcon(":/exit.png"));
@@ -129,7 +142,7 @@ void MainWindow::createActions()
    insertImageAction->setStatusTip(tr("insert Image"));
    //connect(insertImageAction,&QAction::triggered,this,&MainWindow::insertImage);
 
-   insertTableAction= new QAction(tr("insertTable"));
+   insertTableAction= new QAction(tr("insert Table"));
    insertTableAction->setIcon(QIcon(":/table.png"));
    insertTableAction->setShortcut(Qt::CTRL+Qt::SHIFT+Qt::Key_T);
    insertTableAction->setToolTip(tr("insertTable"));
@@ -297,6 +310,8 @@ void MainWindow::createMenus()
     fileMenu->addSeparator();
     fileMenu->addAction(printAction);
     fileMenu->addAction(exportAction);
+    fileMenu->addAction(closeAction);
+    fileMenu->addAction(closeAllAction);
     fileMenu->addAction(exitAction);
 
     editMenu = menuBar()->addMenu(tr("&edit"));
@@ -586,6 +601,46 @@ void MainWindow::fileSaveAs()
     }
 }
 
+void MainWindow::closeDocument()
+{
+    if(activeTextEditor())
+    {
+//        int ret = QMessageBox::question(this,tr("close current Document"),tr("Do you want to save current Document?"),QMessageBox::Yes,QMessageBox::No,QMessageBox::Cancel);
+//        switch (ret) {
+//        case QMessageBox::Yes:
+//            this->fileSave();
+//            break;
+//        case QMessageBox::No:
+//            activeTextEditor()->close();
+//            break;
+//        case QMessageBox::Cancel:
+//            break;
+//        default:
+//            break;&&activeTextEditor()->document()->isModified()
+        this->fileSave();
+
+    }
+}
+
+void MainWindow::closeAllDocuments()
+{
+//	1. if there have any useful documents
+//    2. if save them All
+//    3. yes->save them all
+//   	4. No-> cancel
+    if(activeTextEditor())
+    {
+      QMessageBox::question(this,tr("close all documents"),tr("do you want to close all documents?"),QMessageBox::YesToAll,QMessageBox::No,QMessageBox::Cancel) ;
+      foreach (QMdiSubWindow *window, mdiArea->subWindowList()) {
+      SubTextEdit *textEditor = qobject_cast<SubTextEdit *>(window->widget());
+      textEditor->save();
+      }
+    }
+    else
+        QMessageBox::question(this,tr("close all documents"),tr("there have no any activate documents"));
+
+}
+
 void MainWindow::redo()
 {
     if(activeTextEditor())
@@ -663,7 +718,7 @@ void MainWindow::listStyle(int i)
 void MainWindow::textBold()
 {
     QTextCharFormat fmt;
-    fmt.setFontWeight(boldTextAction->isChecked()?QFont::Bold:QFont::Normal);
+    fmt.setFontWeight(boldTextAction->isChecked() ?QFont::Bold:QFont::Normal);
     if(activeTextEditor())
     {
         activeTextEditor()->mergeFormatOnwordsOrSelection(fmt);

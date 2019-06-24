@@ -140,16 +140,28 @@ void SubTextEdit::closeEvent(QCloseEvent *event)
 {
     if(savePromot())
         event->accept();
+    else if (document()->isEmpty())
+    {
+        event->accept();
+    }
     else
     {
         event->ignore();
     }
 }
 
+//void SubTextEdit::mergeFormatOnwordsOrSelection(const QTextCharFormat &format)
+//{
+//    QTextCursor cursor = this->textCursor();
+//    if(!cursor.hasSelection())
+//        cursor.select(QTextCursor::WordUnderCursor);
+//    cursor.mergeCharFormat(format);
+//    this->mergeCurrentCharFormat(format);
+//}
 void SubTextEdit::mergeFormatOnwordsOrSelection(const QTextCharFormat &format)
 {
     QTextCursor cursor = this->textCursor();
-    if(cursor.hasSelection()==false)
+    if (!cursor.hasSelection())
         cursor.select(QTextCursor::WordUnderCursor);
     cursor.mergeCharFormat(format);
     this->mergeCurrentCharFormat(format);

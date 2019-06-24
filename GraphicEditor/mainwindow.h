@@ -15,6 +15,7 @@
 #include <QTextCodec>
 #include <QString>
 #include <QTextCursor>
+#include <QFont>
 #include <QToolBar>
 #include <QComboBox>
 #include <QFontComboBox>
@@ -47,6 +48,8 @@ private:
     QAction *exportAction;
     QAction *printAction;
     QAction *printViewAction;
+    QAction *closeAction;
+    QAction *closeAllAction;
     QAction *exitAction;
 
     QAction *undoAction;
@@ -120,19 +123,18 @@ private:
     void windowTitle();
     void enableTextEdit();
     void updateMenus();
-    SubTextEdit *createTextEditor();
-    SubTextEdit *activeTextEditor();
-
     void fileOpen();
-    QMdiSubWindow *findOpenedFile(const QString &filename);	//check opened file whether was already opend in editor
-    void fileLoad(const QString &FullFileName);
-
     void fileSave();
     void fileSaveAs();
+    void closeDocument();
+    void closeAllDocuments();
+    QMdiSubWindow *findOpenedFile(const QString &filename);	//check opened file whether was already opend in editor
+    SubTextEdit *createTextEditor();
+    SubTextEdit *activeTextEditor();
+    void fileLoad(const QString &FullFileName);
     void undo();
     void redo();
     void cut();
-
     void copy();
     void paste();
     void selectAll();
